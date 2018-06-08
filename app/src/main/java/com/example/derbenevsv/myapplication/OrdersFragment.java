@@ -3,60 +3,37 @@ package com.example.derbenevsv.myapplication;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.derbenevsv.myapplication.dummy.DummyContent;
-import com.example.derbenevsv.myapplication.dummy.DummyContent.DummyItem;
+import com.example.derbenevsv.myapplication.api_1c.Entitys.OrderEntity;
+import com.example.derbenevsv.myapplication.api_1c.Responses.GetOrdersResponse;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link }
  * interface.
  */
-public class OrdersFragment extends Fragment
+public class OrdersFragment extends Fragment implements Callback
 {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    RecyclerView recyclerView;
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public OrdersFragment()
-    {
-    }
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static OrdersFragment newInstance(int columnCount)
-    {
-        OrdersFragment fragment = new OrdersFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null)
-        {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
-    }
+    private OnOrderClickListener mListener;
+    private OrdersAdapter ordersAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,34 +42,35 @@ public class OrdersFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_orders, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView)
-        {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1)
-            {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else
-            {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyOrdersRecyclerViewAdapter(DummyContent.ITEMS, mListener));
-        }
+
+        Context context = view.getContext();
+        recyclerView = (RecyclerView) view.findViewById(R.id.rvOrders);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//        recyclerView.setAdapter(ordersAdapter);
+
         return view;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+
+    }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener)
+        if (context instanceof OnOrderClickListener)
         {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else
+            mListener = (OnOrderClickListener) context;
+        }
+        else
         {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnOrderClickListener");
         }
     }
 
@@ -101,6 +79,37 @@ public class OrdersFragment extends Fragment
     {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResponse(Call call, Response response)
+    {
+        if (response.isSuccessful())
+        {
+            List<OrderEntity> orders;
+            if (response.body() != null)
+            {
+                orders = ((GetOrdersResponse) response.body()).getOrders();
+                if (ordersAdapter == null)
+                {
+                    ordersAdapter = new OrdersAdapter(orders, mListener);
+                    recyclerView.setAdapter(ordersAdapter);
+                }
+                else
+                {
+                    ordersAdapter.SetOrders(orders);
+                }
+
+                ordersAdapter.notifyDataSetChanged();
+            }
+
+        }
+    }
+
+    @Override
+    public void onFailure(Call call, Throwable t)
+    {
+
     }
 
     /**
@@ -113,9 +122,9 @@ public class OrdersFragment extends Fragment
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener
+    public interface OnOrderClickListener
     {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(OrderEntity item);
     }
 }

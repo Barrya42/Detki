@@ -9,13 +9,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.derbenevsv.myapplication.api_1c.Api;
-import com.example.derbenevsv.myapplication.api_1c.Responses.CheckSessionResponse;
+
+import java.io.IOException;
+import java.util.Timer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,27 +64,36 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         PreferenceHelper.Initialize(this);
         api = new Api();
-        api.CheckSession(new Callback<CheckSessionResponse>()
+        api.CheckSession(new Callback<String>()
         {
             @Override
-            public void onResponse(Call<CheckSessionResponse> call, Response<CheckSessionResponse> response)
+            public void onResponse(Call<String> call, Response<String> response)
             {
 
                 if (response.isSuccessful())
                 {
-                    CheckSessionResponse checkSessionResponse = response.body();
-
-
                     Snackbar.make(fab, "Не требуется авторизации.", Snackbar.LENGTH_LONG)
                             .show();
-                } else
+                    OpenOrdersFragment();
+                }
+                else if (response.code() == 401)
                 {
+                    try
+                    {
+                        Log.d("main", response.errorBody()
+                                .string());
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                     OpenAuthorizationFragment();
                 }
+                Log.d("main", String.valueOf(response.code()));
             }
 
             @Override
-            public void onFailure(Call<CheckSessionResponse> call, Throwable t)
+            public void onFailure(Call<String> call, Throwable t)
             {
 //                Snackbar.make(fab, "Нужно авторизоваться.", Snackbar.LENGTH_LONG);
             }
@@ -89,9 +101,17 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void OpenOrdersFragment()
+    {
+        getSupportFragmentManager().beginTransaction()
+                //.addToBackStack(null)
+                .replace(R.id.fragmentContainer, new OrdersFragment())
+                .commit();
+    }
+
     private void OpenAuthorizationFragment()
     {
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 //.addToBackStack(null)
                 .replace(R.id.fragmentContainer, new AuthorizationFragment())
                 .commit();
@@ -106,7 +126,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START))
         {
             drawer.closeDrawer(GravityCompat.START);
-        } else
+        }
+        else
         {
             getFragmentManager().popBackStack();
 
@@ -152,24 +173,29 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera)
         {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery)
+        }
+        else if (id == R.id.nav_gallery)
         {
 
-        } else if (id == R.id.nav_slideshow)
+        }
+        else if (id == R.id.nav_slideshow)
         {
 
 
-        } else if (id == R.id.nav_manage)
+        }
+        else if (id == R.id.nav_manage)
         {
             getFragmentManager().beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.fragmentContainer, new PreferenceFragmentImpl())
                     .commit();
 
-        } else if (id == R.id.nav_share)
+        }
+        else if (id == R.id.nav_share)
         {
 
-        } else if (id == R.id.nav_send)
+        }
+        else if (id == R.id.nav_send)
         {
 
         }

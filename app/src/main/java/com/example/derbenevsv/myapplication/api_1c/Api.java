@@ -4,13 +4,16 @@ import android.support.annotation.NonNull;
 import android.util.Base64;
 
 import com.example.derbenevsv.myapplication.PreferenceHelper;
-import com.example.derbenevsv.myapplication.api_1c.Responses.CheckSessionResponse;
+import com.example.derbenevsv.myapplication.api_1c.Responses.GetOrdersResponse;
 import com.example.derbenevsv.myapplication.api_1c.Responses.LoginResponse;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -30,7 +33,9 @@ public class Api
 
     public Api()
     {
-        retrofit = new Retrofit.Builder()
+        java.net.Proxy proxy = new Proxy(Proxy.Type.HTTP,  new InetSocketAddress("167.16.1.250", 8080));
+        OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
+        retrofit = new Retrofit.Builder().client(client)
                 .baseUrl(baseURL + "/" + publicBaseName + "/hs/" + httpServiceName + "/") //Базовая часть адреса
                 .addConverterFactory(GsonConverterFactory.create()) //Конвертер, необходимый для преобразования JSON'а в объекты
                 .build();
@@ -43,6 +48,13 @@ public class Api
 //    public static void Initialize()
 //    {
 //    }
+
+    public void GetOrders(@NonNull Callback<GetOrdersResponse> callback)
+    {
+        instance.GetOrders(authEncoded, sessionGuid)
+                .enqueue(callback);
+    }
+
 
     public void CheckSession(@NonNull Callback<String> callback)
     {

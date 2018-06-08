@@ -1,9 +1,10 @@
 package com.example.derbenevsv.myapplication;
 
-import android.app.Fragment;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -11,8 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.derbenevsv.myapplication.api_1c.Responses.LoginResponse;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,8 +29,8 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
     Button btCancel;
     EditText etPhone;
     EditText etPass;
-    private String phone;
-    private String pass;
+    private String phone = "";
+    private String pass = "";
     private Context context;
     private ProgressDialog progressDialog;
     private OnLoginListener onLoginLitener;
@@ -60,11 +64,12 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         btCancel = rootView.findViewById(R.id.btCancel);
         etPhone = rootView.findViewById(R.id.etPhone);
         etPass = rootView.findViewById(R.id.etPassword);
+
         etPhone.addTextChangedListener(this);
         etPass.addTextChangedListener(this);
         btLogin.setOnClickListener(this);
         btCancel.setOnClickListener(this);
-
+        LoginEnable();
         return rootView;
     }
 
@@ -77,6 +82,12 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         {
             onLoginLitener = (OnLoginListener) context;
         }
+        else
+        {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnLoginListener");
+        }
+
     }
 
     @Override
@@ -89,16 +100,21 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View view)
     {
+        etPass.clearFocus();
+        etPhone.clearFocus();
         if (view.getId() == R.id.btLogin)
         {
             MainActivity.getApi()
                     .Login(phone, pass, this);
-
-            progressDialog = new ProgressDialog(context);
+            if (progressDialog == null)
+            {
+                progressDialog = new ProgressDialog(context);
+            }
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.setMessage("Вход...");
             progressDialog.show();
-        } else if (view.getId() == R.id.btCancel)
+        }
+        else if (view.getId() == R.id.btCancel)
         {
 
         }
@@ -113,17 +129,43 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
             MainActivity.getApi()
                     .SetSessionGuid(loginResponse.GetSessionGuid());
             progressDialog.dismiss();
-            if (onLoginLitener != null)
+            onLoginLitener.OnLogin();
+        }
+        else
+        {
+            String errorText = "Неизвестная ошибка.";
+            try
             {
-                onLoginLitener.OnLogin();
+                errorText = response.errorBody()
+                        .string();
             }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            progressDialog.dismiss();
+            Toast.makeText(context, errorText, Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
     @Override
     public void onFailure(Call call, Throwable t)
     {
+        try
+        {
+            throw t;
+        }
+        catch (Throwable throwable)
+        {
+            throwable.printStackTrace();
+        }
+    }
 
+
+    private void LoginEnable()
+    {
+        btLogin.setEnabled(!phone.isEmpty() && !pass.isEmpty());
     }
 
     @Override
@@ -141,9 +183,12 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
     @Override
     public void afterTextChanged(Editable editable)
     {
-        btLogin.setEnabled(etPass.length() > 0 && etPhone.length() > 0);
+        pass = etPass.getText()
+                .toString();
+        phone = etPhone.getText()
+                .toString();
+        LoginEnable();
     }
-
 
     interface OnLoginListener
     {
