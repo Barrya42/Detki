@@ -34,6 +34,7 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
     private Context context;
     private ProgressDialog progressDialog;
     private OnLoginListener onLoginLitener;
+    private SnackBarShower snackBarShower;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -86,6 +87,15 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         {
             throw new RuntimeException(context.toString()
                     + " must implement OnLoginListener");
+        }
+        if (context instanceof SnackBarShower)
+        {
+            snackBarShower = (SnackBarShower) context;
+        }
+        else
+        {
+            throw new RuntimeException(context.toString()
+                    + " must implement snackBarShower");
         }
 
     }
@@ -144,8 +154,10 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
                 e.printStackTrace();
             }
             progressDialog.dismiss();
-            Toast.makeText(context, errorText, Toast.LENGTH_SHORT)
-                    .show();
+//            Toast.makeText(context, errorText, Toast.LENGTH_SHORT)
+//                    .show();
+            snackBarShower.ShowSnackBar(errorText);
+
         }
     }
 

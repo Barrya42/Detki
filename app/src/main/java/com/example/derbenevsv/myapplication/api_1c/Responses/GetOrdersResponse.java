@@ -18,9 +18,9 @@ public class GetOrdersResponse
         return orders;
     }
 
-    public void setOrders(List<OrderEntity> orders)
-    {
-        this.orders = orders;
-    }
+   // public void setOrders(List<OrderEntity> orders)
+    //{
+    //    this.orders = orders;
+    //}
 
 }

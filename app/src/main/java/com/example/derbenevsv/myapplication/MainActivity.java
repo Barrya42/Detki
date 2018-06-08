@@ -13,22 +13,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.derbenevsv.myapplication.api_1c.Api;
 
 import java.io.IOException;
-import java.util.Timer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AuthorizationFragment.OnLoginListener
+        implements NavigationView.OnNavigationItemSelectedListener, AuthorizationFragment.OnLoginListener, SnackBarShower
 {
 
     private static Api api;
+    private FloatingActionButton floatingActionButton;
+    private View fragmentContainer;
 
     public static Api getApi()
     {
@@ -41,10 +41,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
+        setSupportActionBar(toolbar);
+        fragmentContainer = findViewById(R.id.fragmentContainer);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (response.isSuccessful())
                 {
-                    Snackbar.make(fab, "Не требуется авторизации.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(floatingActionButton, "Не требуется авторизации.", Snackbar.LENGTH_LONG)
                             .show();
                     OpenOrdersFragment();
                 }
@@ -208,8 +209,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void OnLogin()
     {
-        Toast.makeText(this, "Успешно авторизован.", Toast.LENGTH_LONG)
+
+        ShowSnackBar("Успешно авторизован.");
+        OpenOrdersFragment();
+
+    }
+
+    @Override
+    public void ShowSnackBar(String text)
+    {
+        Snackbar.make(fragmentContainer, text, Snackbar.LENGTH_SHORT)
                 .show();
 
     }
+
+
 }
