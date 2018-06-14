@@ -9,6 +9,9 @@ import android.widget.TextView;
 import com.example.derbenevsv.myapplication.OrdersFragment.OnOrderClickListener;
 import com.example.derbenevsv.myapplication.api_1c.Entitys.OrderEntity;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -47,8 +50,12 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
         holder.mItem = mValues.get(position);
         holder.mNumberView.setText(mValues.get(position)
                 .getOrderNumber());
-        holder.mOrderDateView.setText(mValues.get(position)
-                .getOrderDate());
+        Date date = mValues.get(position)
+                .getOrderDate();
+        GregorianCalendar calDate = new GregorianCalendar();
+        calDate.setTime(date);
+        String dateString = calDate.get(Calendar.DAY_OF_MONTH) + "." + calDate.get(Calendar.MONTH) + "." + calDate.get(Calendar.YEAR);
+        holder.mOrderDateView.setText(dateString);
 
         holder.mView.setOnClickListener(new View.OnClickListener()
         {

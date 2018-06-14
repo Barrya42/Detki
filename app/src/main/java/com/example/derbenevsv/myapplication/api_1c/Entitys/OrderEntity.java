@@ -3,6 +3,8 @@ package com.example.derbenevsv.myapplication.api_1c.Entitys;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class OrderEntity extends AbstractLink
 {
     @SerializedName("orderNumber")
@@ -10,10 +12,10 @@ public class OrderEntity extends AbstractLink
     private String orderNumber;
     @SerializedName("orderDate")
     @Expose
-    private String orderDate;
+    private Date orderDate;
     @SerializedName("orderSumm")
     @Expose
-    private int orderSumm;
+    private double orderSumm;
 
 
     public String getOrderNumber()
@@ -26,17 +28,17 @@ public class OrderEntity extends AbstractLink
         this.orderNumber = orderNumber;
     }
 
-    public String getOrderDate()
+    public Date getOrderDate()
     {
         return orderDate;
     }
 
-    public void setOrderDate(String orderDate)
+    public void setOrderDate(Date orderDate)
     {
         this.orderDate = orderDate;
     }
 
-    public int getOrderSumm()
+    public double getOrderSumm()
     {
         return orderSumm;
     }

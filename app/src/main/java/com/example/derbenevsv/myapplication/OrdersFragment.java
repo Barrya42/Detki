@@ -56,7 +56,8 @@ public class OrdersFragment extends Fragment implements Callback
     {
         super.onCreate(savedInstanceState);
 
-
+        MainActivity.getApi()
+                .GetOrders(this);
     }
 
     @Override
@@ -109,7 +110,7 @@ public class OrdersFragment extends Fragment implements Callback
     @Override
     public void onFailure(Call call, Throwable t)
     {
-
+        t.printStackTrace();
     }
 
     /**

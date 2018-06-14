@@ -1,7 +1,6 @@
 package com.example.derbenevsv.myapplication;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.derbenevsv.myapplication.api_1c.Responses.LoginResponse;
 
@@ -29,12 +28,14 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
     Button btCancel;
     EditText etPhone;
     EditText etPass;
+    CheckBox cbRememberMe;
     private String phone = "";
     private String pass = "";
     private Context context;
-    private ProgressDialog progressDialog;
+    //    private ProgressDialog progressDialog;
     private OnLoginListener onLoginLitener;
     private SnackBarShower snackBarShower;
+    private ProgressDialogShower progressDialogShower;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -65,11 +66,20 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         btCancel = rootView.findViewById(R.id.btCancel);
         etPhone = rootView.findViewById(R.id.etPhone);
         etPass = rootView.findViewById(R.id.etPassword);
+        cbRememberMe = rootView.findViewById(R.id.cbRememberMe);
 
         etPhone.addTextChangedListener(this);
         etPass.addTextChangedListener(this);
         btLogin.setOnClickListener(this);
         btCancel.setOnClickListener(this);
+
+        String storedPhone = PreferenceHelper.GetPhone();
+        if (storedPhone != "")
+        {
+            etPhone.setText(storedPhone);
+            phone = storedPhone;
+        }
+
         LoginEnable();
         return rootView;
     }
@@ -97,6 +107,15 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
             throw new RuntimeException(context.toString()
                     + " must implement snackBarShower");
         }
+        if (context instanceof ProgressDialogShower)
+        {
+            progressDialogShower = (ProgressDialogShower) context;
+        }
+        else
+        {
+            throw new RuntimeException(context.toString()
+                    + " must implement ProgressDialogShower");
+        }
 
     }
 
@@ -116,13 +135,7 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         {
             MainActivity.getApi()
                     .Login(phone, pass, this);
-            if (progressDialog == null)
-            {
-                progressDialog = new ProgressDialog(context);
-            }
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setMessage("Вход...");
-            progressDialog.show();
+            progressDialogShower.ShowProgressDialog("Вход...");
         }
         else if (view.getId() == R.id.btCancel)
         {
@@ -137,9 +150,13 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         {
             LoginResponse loginResponse = (LoginResponse) response.body();
             MainActivity.getApi()
-                    .SetSessionGuid(loginResponse.GetSessionGuid());
-            progressDialog.dismiss();
+                    .SetSessionGuid(loginResponse.sessionGuid);
+            progressDialogShower.HideProgressDialog();
             onLoginLitener.OnLogin();
+            if (cbRememberMe.isChecked())
+            {
+                PreferenceHelper.SetPhone(phone);
+            }
         }
         else
         {
@@ -153,7 +170,7 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
             {
                 e.printStackTrace();
             }
-            progressDialog.dismiss();
+            progressDialogShower.HideProgressDialog();
 //            Toast.makeText(context, errorText, Toast.LENGTH_SHORT)
 //                    .show();
             snackBarShower.ShowSnackBar(errorText);

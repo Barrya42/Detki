@@ -4,13 +4,12 @@
     tools:showIn="navigation_view">
 
     <group
-        android:checkableBehavior="single"
         android:id="@+id/nav_group"
-        >
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import"/>
+            android:title="Import" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
@@ -37,5 +36,9 @@
                 android:title="Send" />
         </menu>
     </item>
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_menu_send"
+        android:title="Logout" />
 
 </menu>

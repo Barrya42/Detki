@@ -50,7 +50,7 @@
             app:layout_constraintVertical_bias="0.958" />
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/cbRememberMe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -70,7 +70,7 @@
             android:layout_marginTop="8dp"
             android:text="Отмена"
             app:layout_constraintStart_toEndOf="@+id/btLogin"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+            app:layout_constraintTop_toBottomOf="@+id/cbRememberMe" />
 
         <Button
             android:id="@+id/btLogin"
@@ -84,7 +84,7 @@
             android:text="Вход"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox"
+            app:layout_constraintTop_toBottomOf="@+id/cbRememberMe"
             app:layout_constraintVertical_bias="0.0" />
     </android.support.constraint.ConstraintLayout>
 

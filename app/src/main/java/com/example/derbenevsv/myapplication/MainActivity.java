@@ -1,5 +1,6 @@
 package com.example.derbenevsv.myapplication;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.derbenevsv.myapplication.api_1c.Api;
+import com.example.derbenevsv.myapplication.api_1c.Entitys.OrderEntity;
+import com.example.derbenevsv.myapplication.api_1c.Responses.LogoutResponse;
 
 import java.io.IOException;
 
@@ -23,12 +26,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AuthorizationFragment.OnLoginListener, SnackBarShower
+        implements NavigationView.OnNavigationItemSelectedListener, AuthorizationFragment.OnLoginListener, SnackBarShower, OrdersFragment.OnOrderClickListener, ProgressDialogShower
 {
 
     private static Api api;
     private FloatingActionButton floatingActionButton;
     private View fragmentContainer;
+    private ProgressDialog progressDialog;
 
     public static Api getApi()
     {
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-
+        progressDialog = new ProgressDialog(this);
         navigationView.setNavigationItemSelectedListener(this);
         PreferenceHelper.Initialize(this);
         api = new Api();
@@ -96,7 +100,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<String> call, Throwable t)
             {
-//                Snackbar.make(fab, "Нужно авторизоваться.", Snackbar.LENGTH_LONG);
+                ShowSnackBar(t.getMessage());
+                OpenAuthorizationFragment();
             }
         });
 
@@ -200,6 +205,44 @@ public class MainActivity extends AppCompatActivity
         {
 
         }
+        else if (id == R.id.nav_logout)
+        {
+            getApi().Logout(new Callback<LogoutResponse>()
+            {
+                @Override
+                public void onResponse(Call<LogoutResponse> call, Response<LogoutResponse> response)
+                {
+                    if (response.isSuccessful())
+                    {
+                        HideProgressDialog();
+                        ShowSnackBar("Выполнен выход.");
+                        OpenAuthorizationFragment();
+                    }
+                    else
+                    {
+                        HideProgressDialog();
+                        try
+                        {
+                            ShowSnackBar(response.errorBody()
+                                    .string());
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<LogoutResponse> call, Throwable t)
+                {
+                    ShowSnackBar(t.getMessage());
+                    t.printStackTrace();
+                }
+            });
+            ShowProgressDialog("Выход...");
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -220,8 +263,30 @@ public class MainActivity extends AppCompatActivity
     {
         Snackbar.make(fragmentContainer, text, Snackbar.LENGTH_SHORT)
                 .show();
+        Log.d("TAG", "ShowSnackBar: " + text);
 
     }
 
 
+    @Override
+    public void onListFragmentInteraction(OrderEntity item)
+    {
+        ShowSnackBar("Открываем заказы.");
+    }
+
+    @Override
+    public void ShowProgressDialog(String message)
+    {
+
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage(message);
+        progressDialog.show();
+
+    }
+
+    @Override
+    public void HideProgressDialog()
+    {
+        progressDialog.dismiss();
+    }
 }

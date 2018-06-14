@@ -6,6 +6,7 @@ import android.util.Base64;
 import com.example.derbenevsv.myapplication.PreferenceHelper;
 import com.example.derbenevsv.myapplication.api_1c.Responses.GetOrdersResponse;
 import com.example.derbenevsv.myapplication.api_1c.Responses.LoginResponse;
+import com.example.derbenevsv.myapplication.api_1c.Responses.LogoutResponse;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -82,6 +83,11 @@ public class Api
         instance.Login(authEncoded, phone, encoded)
                 .enqueue(callback);
 
+    }
+
+    public void Logout(@NonNull Callback<LogoutResponse> callback)
+    {
+        instance.Logout(authEncoded, sessionGuid).enqueue(callback);
     }
 
     public void SetSessionGuid(String newGuid)
