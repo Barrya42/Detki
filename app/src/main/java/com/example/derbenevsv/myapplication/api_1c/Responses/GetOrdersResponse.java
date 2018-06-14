@@ -11,7 +11,7 @@ public class GetOrdersResponse
 
     @SerializedName("orders")
     @Expose
-    public List<OrderEntity> orders = null;
+    private List<OrderEntity> orders = null;
 
     public List<OrderEntity> getOrders()
     {

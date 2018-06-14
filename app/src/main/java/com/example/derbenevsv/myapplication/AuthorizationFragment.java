@@ -150,7 +150,7 @@ public class AuthorizationFragment extends Fragment implements View.OnClickListe
         {
             LoginResponse loginResponse = (LoginResponse) response.body();
             MainActivity.getApi()
-                    .SetSessionGuid(loginResponse.sessionGuid);
+                    .SetSessionGuid(loginResponse.GetSessionGuid());
             progressDialogShower.HideProgressDialog();
             onLoginLitener.OnLogin();
             if (cbRememberMe.isChecked())

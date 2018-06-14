@@ -7,15 +7,15 @@ public class LoginResponse
 {
     @SerializedName("sessionGuid")
     @Expose
-    public String sessionGuid;
+    private String sessionGuid;
 
-//    public String GetSessionGuid()
-//    {
-//        return sessionGuid;
-//    }
-//
-//    public void SetSessionGuid(String value)
-//    {
-//        sessionGuid = value;
-//    }
+    public String GetSessionGuid()
+    {
+        return sessionGuid;
+    }
+
+    public void SetSessionGuid(String value)
+    {
+        sessionGuid = value;
+    }
 }

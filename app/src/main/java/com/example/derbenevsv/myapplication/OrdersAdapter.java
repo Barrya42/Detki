@@ -47,10 +47,11 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position)
     {
-        holder.mItem = mValues.get(position);
-        holder.mNumberView.setText(mValues.get(position)
+        OrderEntity orderEntity = mValues.get(position);
+        holder.mItem = orderEntity;
+        holder.mNumberView.setText(orderEntity
                 .getOrderNumber());
-        Date date = mValues.get(position)
+        Date date = orderEntity
                 .getOrderDate();
         GregorianCalendar calDate = new GregorianCalendar();
         calDate.setTime(date);
